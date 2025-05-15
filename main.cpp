@@ -33,24 +33,20 @@ void Draw(const SNAKE& snake) {
         gotoxy(snake.A[i].x * 2, snake.A[i].y);
         std::cout << "##";
     }
-    // move cursor out of the way
     gotoxy(0, 20);
 }
 
 void Run(SNAKE& snake, int dir) {
-    // shift body
     for (int i = snake.Leng; i > 0; i--)
         snake.A[i] = snake.A[i - 1];
 
-    // move head
     switch (dir) {
-        case 0: snake.A[0].x++; break;  // right
-        case 1: snake.A[0].y++; break;  // down
-        case 2: snake.A[0].x--; break;  // left
-        case 3: snake.A[0].y--; break;  // up
+        case 0: snake.A[0].x++; break;
+        case 1: snake.A[0].y++; break;
+        case 2: snake.A[0].x--; break;
+        case 3: snake.A[0].y--; break;
     }
 
-    // wrap-around at 0..39 x-range, 0..19 y-range
     if (snake.A[0].x < 0)      snake.A[0].x = 39;
     else if (snake.A[0].x > 39) snake.A[0].x = 0;
     if (snake.A[0].y < 0)      snake.A[0].y = 19;
@@ -62,7 +58,7 @@ int main() {
     Init(snake);
     Draw(snake);
 
-    int dir = 0;   // 0=→,1=↓,2=←,3=↑
+    int dir = 0;
     while (true) {
         if (kbhit()) {
             switch (getch()) {
