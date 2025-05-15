@@ -1,90 +1,80 @@
-#include <iostream>
 #include <windows.h>
-#include <cstdlib>
 #include <conio.h>
-#include <time.h>
-#define MINX 2
-#define MINY 2
-#define MAXX 35
-#define MAXY 20
-using namespace std;
-void gotoxy( int column, int line );
-struct Point{
-    int x,y;
+#include <iostream>
+
+struct NODE {
+    int x, y;
 };
-class CONRAN{
-public:
-    struct Point A[100];
-    int DoDai;
-    CONRAN(){
-        DoDai = 3;
-        A[0].x = 10; A[0].y = 10;
-        A[1].x = 11; A[1].y = 10;
-        A[2].x = 12; A[2].y = 10;
-    }
-    void Ve(Point Qua){
-        for (int i = 0; i < DoDai; i++){
-            gotoxy(A[i].x,A[i].y);
-            cout<<"X";
-        }
-        gotoxy(Qua.x, Qua.y); cout<<"*";
-    }
-    void DiChuyen(int Huong, Point& Qua){
-        for (int i = DoDai-1; i>0;i--)
-            A[i] = A[i-1];
-        if (Huong==0) A[0].x = A[0].x + 1;
-        if (Huong==1) A[0].y = A[0].y + 1;
-        if (Huong==2) A[0].x = A[0].x - 1;
-        if (Huong==3) A[0].y = A[0].y - 1;
-        if ((A[0].x == Qua.x) && (A[0].y == Qua.y)){
-            DoDai++;
-            Qua.x = rand()%(MAXX-MINX)+MINX;
-            Qua.y = rand()%(MAXY-MINY)+MINY;
-        }
-    }
+
+struct SNAKE {
+    NODE A[100];
+    int Leng;
 };
-void VeKhung(){
-    for (int i = MINX ; i<=MAXX ; i++)
-        for (int j = MINX ; j<=MAXY ; j++)
-            if ((i==MINX) || (i==MAXX) || (j==MINY) || (j==MAXY)){
-            gotoxy(i,j);
-            printf("+");
-        }
+
+void gotoxy(int column, int line) {
+    COORD coord{ SHORT(column), SHORT(line) };
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
-int main()
-{
-    CONRAN r;
-    int Huong = 0;
-    char t;
-    Point Qua;
-    srand((int)time(0));
-    Qua.x = rand()%(MAXX-MINX)+MINX;
-    Qua.y = rand()%(MAXY-MINY)+MINY;
-    while (1){
-        if (kbhit()){
-            t = getch();
-            if (t=='a') Huong = 2;
-            if (t=='w') Huong = 3;
-            if (t=='d') Huong = 0;
-            if (t=='x') Huong = 1;
-        }
-        system("cls");
-        VeKhung();
-        r.Ve(Qua);
-        r.DiChuyen(Huong, Qua);
-        Sleep(300);
+
+void Init(SNAKE& snake) {
+    snake.Leng = 7;
+    // start vertical, then turn right
+    snake.A[0] = { 5, 5 };
+    snake.A[1] = { 5, 6 };
+    snake.A[2] = { 5, 7 };
+    snake.A[3] = { 5, 8 };
+    snake.A[4] = { 6, 8 };
+    snake.A[5] = { 7, 8 };
+    snake.A[6] = { 8, 8 };
+}
+
+void Draw(const SNAKE& snake) {
+    for (int i = 0; i < snake.Leng; i++) {
+        gotoxy(snake.A[i].x * 2, snake.A[i].y);
+        std::cout << "##";
+    }
+    // move cursor out of the way
+    gotoxy(0, 20);
+}
+
+void Run(SNAKE& snake, int dir) {
+    // shift body
+    for (int i = snake.Leng; i > 0; i--)
+        snake.A[i] = snake.A[i - 1];
+
+    // move head
+    switch (dir) {
+        case 0: snake.A[0].x++; break;  // right
+        case 1: snake.A[0].y++; break;  // down
+        case 2: snake.A[0].x--; break;  // left
+        case 3: snake.A[0].y--; break;  // up
     }
 
+    // wrap-around at 0..39 x-range, 0..19 y-range
+    if (snake.A[0].x < 0)      snake.A[0].x = 39;
+    else if (snake.A[0].x > 39) snake.A[0].x = 0;
+    if (snake.A[0].y < 0)      snake.A[0].y = 19;
+    else if (snake.A[0].y > 19) snake.A[0].y = 0;
+}
+
+int main() {
+    SNAKE snake;
+    Init(snake);
+    Draw(snake);
+
+    int dir = 0;   // 0=→,1=↓,2=←,3=↑
+    while (true) {
+        if (kbhit()) {
+            switch (getch()) {
+                case 'd': dir = 0; break;
+                case 's': dir = 1; break;
+                case 'a': dir = 2; break;
+                case 'w': dir = 3; break;
+            }
+        }
+        Run(snake, dir);
+        Draw(snake);
+        Sleep(200);
+    }
     return 0;
 }
-
-
-void gotoxy( int column, int line ){
-  COORD coord;
-  coord.X = column;
-  coord.Y = line;
-  SetConsoleCursorPosition(
-    GetStdHandle( STD_OUTPUT_HANDLE ),
-    coord
-    );
-  }
