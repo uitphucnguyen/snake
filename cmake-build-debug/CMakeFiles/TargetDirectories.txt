@@ -1,0 +1,3 @@
+/Users/phuc/clin projects/snake-game/cmake-build-debug/CMakeFiles/Snake.dir
+/Users/phuc/clin projects/snake-game/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/phuc/clin projects/snake-game/cmake-build-debug/CMakeFiles/rebuild_cache.dir
